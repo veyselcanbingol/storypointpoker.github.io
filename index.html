@@ -337,17 +337,13 @@
     <!-- index.html içindeki script kısmını güncelleyelim -->
 <script>
     function handleDeepLink() {
-        // Sadece query parametresini kontrol et
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('room');
 
         if (roomId) {
-            // Önce deep link'i dene
-            const iosDeepLink = `storypoker://room/${roomId}`;
-            const androidDeepLink = `storypoker://room/${roomId}`;
-            
             // iOS için
             if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                const iosDeepLink = `storypoker://room/${roomId}`;
                 window.location.href = iosDeepLink;
                 
                 // Uygulama açılmazsa App Store'a yönlendir
@@ -357,7 +353,9 @@
             }
             // Android için
             else if (/Android/.test(navigator.userAgent)) {
-                window.location.href = androidDeepLink;
+                // Intent URL formatını kullan
+                const intentUrl = `intent://room/${roomId}#Intent;scheme=storypoker;package=com.Moor.StoryPointApp;end`;
+                window.location.href = intentUrl;
                 
                 // Uygulama açılmazsa Play Store'a yönlendir
                 setTimeout(function() {
