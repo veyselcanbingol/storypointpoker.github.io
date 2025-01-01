@@ -334,39 +334,48 @@
     </footer>
 
     <!-- Deep linking için JavaScript -->
-    <script>
-        function updateMetaTags() {
-            const path = window.location.pathname;
-            const match = path.match(/\/room\/([^\/]+)/);
+    <!-- index.html içindeki script kısmını güncelleyelim -->
+<script>
+    function handleDeepLink() {
+        // Önce URL'den room ID'sini almayı deneyelim
+        const path = window.location.pathname;
+        const pathMatch = path.match(/\/storypointpoker\.github\.io\/room\/([^\/]+)/);
+        
+        // URL'den query parametresini de kontrol edelim
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryRoomId = urlParams.get('room');
+        
+        // Path'den veya query'den gelen room ID'sini kullan
+        const roomId = pathMatch ? pathMatch[1] : queryRoomId;
+
+        if (roomId) {
+            // iOS meta etiketlerini güncelle
+            document.querySelector('meta[property="al:ios:url"]')
+                .setAttribute('content', `storypoker://room/${roomId}`);
             
-            if (match && match[1]) {
-                const roomId = match[1];
-                
-                // iOS meta etiketlerini güncelle
-                document.querySelector('meta[property="al:ios:url"]')
-                    .setAttribute('content', `storypoker://room/${roomId}`);
-                
-                // Android meta etiketlerini güncelle
-                document.querySelector('meta[property="al:android:url"]')
-                    .setAttribute('content', `storypoker://room/${roomId}`);
-                
-                // Uygulama yüklü değilse mağazaya yönlendir
-                if (!document.hidden) {
-                    setTimeout(function() {
-                        // iOS için
-                        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                            window.location = `https://apps.apple.com/app/id6738718810`;
-                        }
-                        // Android için
-                        else if (/Android/.test(navigator.userAgent)) {
-                            window.location = `https://play.google.com/store/apps/details?id=com.Moor.StoryPointApp`;
-                        }
-                    }, 2000); // 2 saniye bekle
-                }
+            // Android meta etiketlerini güncelle
+            document.querySelector('meta[property="al:android:url"]')
+                .setAttribute('content', `storypoker://room/${roomId}`);
+            
+            // Uygulama yüklü değilse mağazaya yönlendir
+            if (!document.hidden) {
+                setTimeout(function() {
+                    // iOS için
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                        window.location = `https://apps.apple.com/app/id6738718810`;
+                    }
+                    // Android için
+                    else if (/Android/.test(navigator.userAgent)) {
+                        window.location = `https://play.google.com/store/apps/details?id=com.Moor.StoryPointApp`;
+                    }
+                }, 2000); // 2 saniye bekle
             }
         }
-        
-        window.onload = updateMetaTags;
-    </script>
+    }
+    
+    // Sayfa yüklendiğinde ve URL değiştiğinde çalıştır
+    window.onload = handleDeepLink;
+    window.onpopstate = handleDeepLink;
+</script>
 </body>
 </html>
