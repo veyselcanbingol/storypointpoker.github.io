@@ -337,45 +337,38 @@
     <!-- index.html içindeki script kısmını güncelleyelim -->
 <script>
     function handleDeepLink() {
-        // Önce URL'den room ID'sini almayı deneyelim
-        const path = window.location.pathname;
-        const pathMatch = path.match(/\/storypointpoker\.github\.io\/room\/([^\/]+)/);
-        
-        // URL'den query parametresini de kontrol edelim
+        // Sadece query parametresini kontrol et
         const urlParams = new URLSearchParams(window.location.search);
-        const queryRoomId = urlParams.get('room');
-        
-        // Path'den veya query'den gelen room ID'sini kullan
-        const roomId = pathMatch ? pathMatch[1] : queryRoomId;
+        const roomId = urlParams.get('room');
 
         if (roomId) {
-            // iOS meta etiketlerini güncelle
-            document.querySelector('meta[property="al:ios:url"]')
-                .setAttribute('content', `storypoker://room/${roomId}`);
+            // Önce deep link'i dene
+            const iosDeepLink = `storypoker://room/${roomId}`;
+            const androidDeepLink = `storypoker://room/${roomId}`;
             
-            // Android meta etiketlerini güncelle
-            document.querySelector('meta[property="al:android:url"]')
-                .setAttribute('content', `storypoker://room/${roomId}`);
-            
-            // Uygulama yüklü değilse mağazaya yönlendir
-            if (!document.hidden) {
+            // iOS için
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                window.location.href = iosDeepLink;
+                
+                // Uygulama açılmazsa App Store'a yönlendir
                 setTimeout(function() {
-                    // iOS için
-                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                        window.location = `https://apps.apple.com/app/id6738718810`;
-                    }
-                    // Android için
-                    else if (/Android/.test(navigator.userAgent)) {
-                        window.location = `https://play.google.com/store/apps/details?id=com.Moor.StoryPointApp`;
-                    }
-                }, 2000); // 2 saniye bekle
+                    window.location.href = 'https://apps.apple.com/app/id6738718810';
+                }, 1000);
+            }
+            // Android için
+            else if (/Android/.test(navigator.userAgent)) {
+                window.location.href = androidDeepLink;
+                
+                // Uygulama açılmazsa Play Store'a yönlendir
+                setTimeout(function() {
+                    window.location.href = 'https://play.google.com/store/apps/details?id=com.Moor.StoryPointApp';
+                }, 1000);
             }
         }
     }
     
-    // Sayfa yüklendiğinde ve URL değiştiğinde çalıştır
+    // Sayfa yüklendiğinde çalıştır
     window.onload = handleDeepLink;
-    window.onpopstate = handleDeepLink;
 </script>
 </body>
 </html>
