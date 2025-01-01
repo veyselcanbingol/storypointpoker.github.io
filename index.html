@@ -230,6 +230,53 @@
                 align-items: center;
             }
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(108, 92, 231, 0.1);
+        }
+
+        .modal-content h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .modal-button {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .modal-button:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -333,40 +380,64 @@
         <p>&copy; 2024 Moor Story Point Poker App. Tüm hakları saklıdır.</p>
     </footer>
 
-    <!-- Deep linking için JavaScript -->
-    <!-- index.html içindeki script kısmını güncelleyelim -->
-<script>
-    function handleDeepLink() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomId = urlParams.get('room');
+    <div id="appOpenModal" class="modal">
+        <div class="modal-content">
+            <h3>Uygulama Zaten Açık</h3>
+            <p>Story Point Poker uygulaması şu anda açık durumda. Lütfen uygulamayı kapatıp tekrar deneyin.</p>
+            <button class="modal-button" onclick="closeModal()">Tamam</button>
+        </div>
+    </div>
 
-        if (roomId) {
-            // iOS için
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                const iosDeepLink = `storypoker://room/${roomId}`;
-                window.location.href = iosDeepLink;
-                
-                // Uygulama açılmazsa App Store'a yönlendir
-                setTimeout(function() {
-                    window.location.href = 'https://apps.apple.com/app/id6738718810';
-                }, 1000);
-            }
-            // Android için
-            else if (/Android/.test(navigator.userAgent)) {
-                // Intent URL formatını kullan
-                const intentUrl = `intent://room/${roomId}#Intent;scheme=storypoker;package=com.Moor.StoryPointApp;end`;
-                window.location.href = intentUrl;
-                
-                // Uygulama açılmazsa Play Store'a yönlendir
-                setTimeout(function() {
-                    window.location.href = 'https://play.google.com/store/apps/details?id=com.Moor.StoryPointApp';
-                }, 1000);
+    <script>
+        function showModal() {
+            document.getElementById('appOpenModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('appOpenModal').style.display = 'none';
+        }
+
+        function handleDeepLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+
+            if (roomId) {
+                // Eğer uygulama zaten açıksa, modal göster
+                if (document.hidden || document.visibilityState === 'hidden') {
+                    showModal();
+                    return;
+                }
+
+                // iOS için
+                if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                    const iosDeepLink = `storypoker://room/${roomId}`;
+                    window.location.href = iosDeepLink;
+                    
+                    // Uygulama açılmazsa App Store'a yönlendir
+                    setTimeout(function() {
+                        if (!document.hidden) {  // Uygulama açılmadıysa
+                            window.location.href = 'https://apps.apple.com/app/id6738718810';
+                        }
+                    }, 1000);
+                }
+                // Android için
+                else if (/Android/.test(navigator.userAgent)) {
+                    // Intent URL formatını kullan
+                    const intentUrl = `intent://room/${roomId}#Intent;scheme=storypoker;package=com.Moor.StoryPointApp;end`;
+                    window.location.href = intentUrl;
+                    
+                    // Uygulama açılmazsa Play Store'a yönlendir
+                    setTimeout(function() {
+                        if (!document.hidden) {  // Uygulama açılmadıysa
+                            window.location.href = 'https://play.google.com/store/apps/details?id=com.Moor.StoryPointApp';
+                        }
+                    }, 1000);
+                }
             }
         }
-    }
-    
-    // Sayfa yüklendiğinde çalıştır
-    window.onload = handleDeepLink;
-</script>
+        
+        // Sayfa yüklendiğinde çalıştır
+        window.onload = handleDeepLink;
+    </script>
 </body>
 </html>
